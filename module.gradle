@@ -1,0 +1,314 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+def getLocalProperty(String key) {
+    try {
+        return getLocalProperties().getProperty(key)
+    } catch (Exception e) {
+        e.printStackTrace()
+        return ""
+    }
+}
+
+def getLocalProperties() {
+    def properties = new Properties()
+    try {
+        File localPropertiesFile
+        try {
+            localPropertiesFile = new File(rootDir, 'local.properties');
+            if (localPropertiesFile == null || !localPropertiesFile.exists()) {
+                localPropertiesFile = new File("../local.properties")
+            }
+        } catch (Exception e) {
+            localPropertiesFile = new File("../local.properties")
+        }
+        println("localPropertiesFile===:" + localPropertiesFile.absolutePath)
+        properties.load(new FileInputStream(localPropertiesFile))
+        return properties
+    } catch (Exception e) {
+        e.printStackTrace()
+        return properties
+    }
+}
+
+def revision() {
+    def code = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = code
+    }
+    return "\"${code.toString().trim()}\""
+}
+
+/**
+ * 返回当前BaseVersion对应的最新版本，
+ * 如果没有BaseVersion对应的版本，则返回最新版本，
+ * 如果没有版本，则返回1.0.0
+ *
+ * @param snapshot 是否要考虑snapshot包
+ */
+def getLastVersion(String group, String artifactid, boolean snapshot) {
+    return "1.0.0"
+}
+
+/**
+ * 比较，取出两个version中较大的那个
+ */
+static def getMaxVersion(String s1, String s2) {
+    String str1 = s1
+    String str2 = s2
+    if (str1 == null) {
+        return s2
+    } else if (str2 == null) {
+        return null
+    }
+    if (str1.endsWith(".")) {
+        str1 = str1.substring(0, str1.length() - 1)
+    }
+    if (str1.startsWith(".")) {
+        str1 = str1.replace('.', '')
+    }
+    if (str2.endsWith(".")) {
+        str2 = str2.substring(0, str2.length() - 1)
+    }
+    if (str2.startsWith(".")) {
+        str2 = str2.replace('.', '')
+    }
+
+    String[] strArray1 = str1.split("\\.")
+    String[] strArray2 = str2.split("\\.")
+    int max = Math.max(strArray1.length, strArray2.length)
+    for (int i = 0; i < max; i++) {
+        int item1 = 0
+        if (strArray1.length > i) {
+            try {
+                item1 = strArray1[i].toInteger()
+            } catch (Exception e) {
+            }
+        }
+        int item2 = 0
+        if (strArray2.length > i) {
+            try {
+                item2 = strArray2[i].toInteger()
+            } catch (Exception e) {
+            }
+        }
+        if (item1 != item2) {
+            return item1 > item2 ? s1 : s2
+        }
+    }
+    return str1 > str2 ? s1 : s2
+}
+
+static def getSubVersion(String baseVersion, String version) {
+    if (version == null || version.trim().length() == 0) {
+        return ""
+    }
+    if (version.startsWith(baseVersion)) {
+        version = version.replace(baseVersion, "").replace("-SNAPSHOT", "")
+    }
+    if (version.startsWith(".")) {
+        version = version.replace('.', '')
+    }
+    return version
+}
+
+def createNewVersion(String group, String artifactid) {
+    try {
+        String lastversion = getLastVersion(group, artifactid, false)
+        int v = 0
+        if (lastversion.startsWith(baseVersion)) {
+            try {
+                v = getSubVersion(baseVersion, lastversion).toInteger() + 1
+            } catch (Exception e) {
+                e.printStackTrace()
+            }
+        }
+        String version = baseVersion + "." + v
+        return version
+    } catch (Exception e) {
+        e.printStackTrace()
+    }
+    return "1.0.0"
+}
+
+/**
+ * 如果工程中有源码，则依赖源码，
+ * 否则依赖当前 baseVersion 对应的最新版本
+ * 如果传入version是SNAPSHOT，则依赖最新的SNAPSHOT，否则，依赖最新的release
+ */
+def moduleApi(String compileStr) {
+    moduleApi(compileStr, {})
+}
+
+/**
+ * 如果工程中有源码，则依赖源码，
+ * 否则依赖当前 baseVersion 对应的最新版本
+ * 如果传入version是SNAPSHOT，则依赖最新的SNAPSHOT，否则，依赖最新的release
+ */
+def moduleApi(String compileStr, Closure configureClosure) {
+    String[] temp = compileStr.split(":")
+    String group = temp[0]
+    String artifactid = temp[1]
+    String version = temp[2]
+
+    Set<String> includeModule = new HashSet<>()
+    rootProject.getAllprojects().each {
+        if (it != rootProject) includeModule.add(it.name)
+    }
+
+    boolean isUpload2Maven = Boolean.valueOf(getLocalProperty("apply_maven"))
+    if (includeModule.contains(getFixLibName(artifactid)) && !isUpload2Maven) {
+        println(project.name + "源码依赖：===project(\":${getFixLibName(artifactid)}\")")
+        projects.project.dependencies.add("api", project(':' + getFixLibName(artifactid)), configureClosure)
+//        projects.project.configurations { compile.exclude group: group, module: artifactid }
+    } else {
+        if (getAutoUpgradeVersion() == version) {
+            version = getLastVersion(group, artifactid, version.endsWith("-SNAPSHOT"))
+            if (!version.startsWith(baseVersion)) {
+                throw new RuntimeException("没有${baseVersion}对应的依赖版本，请首先编译${artifactid}模块")
+            }
+        }
+        println(project.name + "依赖：=======$group:$artifactid:$version")
+        projects.project.dependencies.add("api", "$group:$artifactid:$version", configureClosure)
+    }
+}
+
+/**
+ * 如果工程中有源码，则依赖源码，
+ * 否则依赖当前 baseVersion 对应的最新版本
+ * 如果传入version是SNAPSHOT，则依赖最新的SNAPSHOT，否则，依赖最新的release
+ */
+def moduleImplementation(String compileStr) {
+    moduleImplementation(compileStr, {})
+}
+
+/**
+ * 如果工程中有源码，则依赖源码，
+ * 否则依赖当前 baseVersion 对应的最新版本
+ * 如果传入version是SNAPSHOT，则依赖最新的SNAPSHOT，否则，依赖最新的release
+ */
+def moduleImplementation(String compileStr, Closure configureClosure) {
+    String[] temp = compileStr.split(":")
+    String group = temp[0]
+    String artifactid = temp[1]
+    String version = temp[2]
+
+    Set<String> includeModule = new HashSet<>()
+    rootProject.getAllprojects().each {
+        if (it != rootProject) includeModule.add(it.name)
+    }
+
+    boolean isUpload2Maven = Boolean.valueOf(getLocalProperty("apply_maven"))
+    if (includeModule.contains(getFixLibName(artifactid)) && !isUpload2Maven) {
+        println(project.name + "源码依赖：===project(\":${getFixLibName(artifactid)}\")")
+        projects.project.dependencies.add("implementation", project(':' + getFixLibName(artifactid)), configureClosure)
+//        projects.project.configurations { compile.exclude group: group, module: artifactid }
+    } else {
+        if (getAutoUpgradeVersion() == version) {
+            version = getLastVersion(group, artifactid, version.endsWith("-SNAPSHOT"))
+            if (!version.startsWith(baseVersion)) {
+                throw new RuntimeException("没有${baseVersion}对应的依赖版本，请首先编译${artifactid}模块")
+            }
+        }
+        println(project.name + "依赖：=======$group:$artifactid:$version")
+        projects.project.dependencies.add("implementation", "$group:$artifactid:$version", configureClosure)
+    }
+}
+
+/**
+ * 如果工程中有源码，则依赖源码，
+ * 否则依赖当前 baseVersion 对应的最新版本
+ * 如果传入version是SNAPSHOT，则依赖最新的SNAPSHOT，否则，依赖最新的release
+ */
+def compileOnlyApi(String compileStr) {
+    compileOnlyApi(compileStr, {})
+}
+
+/**
+ * 如果工程中有源码，则依赖源码，
+ * 否则依赖当前 baseVersion 对应的最新版本
+ * 如果传入version是SNAPSHOT，则依赖最新的SNAPSHOT，否则，依赖最新的release
+ */
+def compileOnlyApi(String compileStr, Closure configureClosure) {
+    String[] temp = compileStr.split(":")
+    String group = temp[0]
+    String artifactid = temp[1]
+    String version = temp[2]
+
+    Set<String> includeModule = new HashSet<>()
+    rootProject.getAllprojects().each {
+        if (it != rootProject) includeModule.add(it.name)
+    }
+
+    if (includeModule.contains(artifactid)) {
+        println(project.name + "源码依赖：===project(\":$artifactid\")")
+        projects.project.dependencies.add("compileOnly", project(':' + artifactid), configureClosure)
+//        projects.project.configurations { compile.exclude group: group, module: artifactid }
+    } else {
+        if (getAutoUpgradeVersion() == version) {
+            version = getLastVersion(group, artifactid, version.endsWith("-SNAPSHOT"))
+            if (!version.startsWith(baseVersion)) {
+                throw new RuntimeException("没有${baseVersion}对应的依赖版本，请首先编译${artifactid}模块")
+            }
+        }
+        println(project.name + "依赖：=======$group:$artifactid:$version")
+        projects.project.dependencies.add("compileOnly", "$group:$artifactid:$version", configureClosure)
+    }
+}
+
+/**
+ * 如果local.properties 文件中有声明，则依赖aar，否则不引入任何类
+ *
+ * 当Jenkins打包时，自动引用 baseVersion 对应最新版本的 release aar
+ */
+def sourceOnly(String compileStr) {
+    sourceOnly(compileStr, {})
+}
+
+/**
+ * 如果local.properties 文件中有声明，则依赖源码，否则不引入任何类
+ *
+ * 当Jenkins打包时，自动引用 baseVersion 对应最新版本的 release aar
+ */
+def sourceOnly(String compileStr, Closure configureClosure) {
+    String[] temp = compileStr.split(":")
+    String group = temp[0]
+    String artifactid = temp[1]
+    String version = temp[2]
+
+    if (Boolean.valueOf(getLocalProperty("jenkins"))) {
+        println(project.name + "依赖：=======$group:$artifactid:$version")
+        projects.project.dependencies.add("implementation", "$group:$artifactid:$version", configureClosure)
+    } else {
+        getLocalProperties().entrySet().each { entry ->
+            def prefix = "lib-"
+            if (entry.key.startsWith(prefix) && Boolean.valueOf(entry.value)) {
+                if (artifactid == entry.key) {
+                    println(project.name + "依赖：=======$group:$artifactid:$version")
+                    projects.project.dependencies.add("api", project(':' + artifactid), configureClosure)
+                }
+            }
+        }
+    }
+}
+
+String getFixLibName(String artifactid) {
+    return artifactid.startsWith("lib-") ? artifactid : "lib-" + artifactid;
+}
+
+private String getAutoUpgradeVersion() {
+    return "999"
+}
+
+ext {
+    getLocalProperty = this.&getLocalProperty
+    getLocalProperties = this.&getLocalProperties
+    sourceOnly = this.&sourceOnly
+    revision = this.&revision
+    moduleApi = this.&moduleApi
+    moduleImplementation = this.&moduleImplementation
+    compileOnlyApi = this.&compileOnlyApi
+    getLastVersion = this.&getLastVersion
+    createNewVersion = this.&createNewVersion
+}

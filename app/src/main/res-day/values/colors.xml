@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="minfrag_bg_day">#F4F4F4</color>
+    <color name="minfrag_menu_day">#FFFFFF</color>
+
+    <color name="text_color_day">#000000</color>
+
+    <color name="top_head_bg_day">#F4F4F4</color>
+</resources>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <data class="FragmentMineBinding">
+        <import type="com.xlcx.skin.demo.R" />
+    </data>
+
+    <com.xlcx.floralskin.core.widget.DayNightBgConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foregroundGravity="center_horizontal"
+        app:dayResource="@{R.color.minfrag_bg_day}"
+        app:nightResource="@{R.color.minfrag_bg_night}">
+
+        <com.xlcx.floralskin.core.widget.DayNightLinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:foregroundGravity="center_horizontal"
+            app:dayResource="@{R.color.top_head_bg_day}"
+
+
+            app:layout_constraintTop_toTopOf="parent"
+            app:nightResource="@{R.color.top_head_bg_night}" />
+
+        <com.xlcx.floralskin.core.widget.DayNightImageView
+            android:id="@+id/setting_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dayResource="@{R.drawable.skin_ic_mine_setting}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:nightResource="@{R.drawable.skin_night_ic_mine_setting}" />
+
+        <com.xlcx.floralskin.core.widget.DayNightImageView
+            android:id="@+id/daynight_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dayResource="@{R.drawable.skin_dn_change_icon}"
+            android:layout_marginRight="30dp"
+            app:layout_constraintRight_toLeftOf="@id/setting_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:nightResource="@{R.drawable.skin_night_dn_change_icon}" />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_header"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="22dp"
+            android:layout_marginTop="48dp"
+            android:src="@drawable/skin_ic_header"
+            android:visibility="visible"
+            app:civ_border_color="#FFFFFFFF"
+            app:civ_border_width="2dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.xlcx.floralskin.core.widget.DayNightTextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="老王头"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:dayResource="@{R.color.text_color_day}"
+            app:layout_constraintLeft_toRightOf="@id/iv_header"
+            app:layout_constraintTop_toTopOf="@+id/iv_header"
+            app:nightResource="@{R.color.text_color_night}" />
+
+        <com.xlcx.floralskin.core.widget.DayNightTextView
+            android:id="@+id/tv_member"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="初级会员"
+            android:textSize="15sp"
+            app:dayResource="@{R.color.text_color_day}"
+            app:layout_constraintLeft_toRightOf="@id/iv_header"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"
+            app:nightResource="@{R.color.text_color_night}" />
+
+
+        <com.xlcx.floralskin.core.widget.DayNightRelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="76dp"
+            android:layout_marginTop="40dp"
+            app:dayResource="@{R.drawable.round_bg_day}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_header"
+            app:nightResource="@{R.drawable.round_bg_night}">
+
+            <!-- order-->
+            <com.xlcx.floralskin.core.widget.DayNightLinearLayout
+                android:id="@+id/order_layout"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+
+                <com.xlcx.floralskin.core.widget.DayNightImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="3dp"
+                    android:scaleType="fitXY"
+                    app:dayResource="@{R.drawable.icon_order}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:nightResource="@{R.drawable.icon_order_night}" />
+
+
+                <com.xlcx.floralskin.core.widget.DayNightTextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="我的订单"
+                    android:textSize="13sp"
+                    app:dayResource="@{R.color.text_color_day}"
+                    app:nightResource="@{R.color.text_color_night}" />
+
+            </com.xlcx.floralskin.core.widget.DayNightLinearLayout>
+
+            <com.xlcx.floralskin.core.widget.DayNightLinearLayout
+                android:id="@+id/feed_layout"
+                android:layout_width="90dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:layout_toRightOf="@id/order_layout"
+                android:orientation="vertical">
+
+
+                <com.xlcx.floralskin.core.widget.DayNightImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="3dp"
+                    android:scaleType="fitXY"
+                    app:dayResource="@{R.drawable.icon_order}"
+                    app:nightResource="@{R.drawable.icon_order_night}" />
+
+
+                <com.xlcx.floralskin.core.widget.DayNightTextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="问题反馈"
+                    android:textSize="13sp"
+                    app:dayResource="@{R.color.text_color_day}"
+                    app:nightResource="@{R.color.text_color_night}" />
+
+            </com.xlcx.floralskin.core.widget.DayNightLinearLayout>
+
+            <!-- reard-->
+            <com.xlcx.floralskin.core.widget.DayNightLinearLayout
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:layout_toRightOf="@+id/feed_layout"
+                android:orientation="vertical">
+
+
+                <com.xlcx.floralskin.core.widget.DayNightImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="3dp"
+                    android:scaleType="fitXY"
+                    app:dayResource="@{R.drawable.icon_order}"
+                    app:nightResource="@{R.drawable.icon_order_night}" />
+
+
+                <com.xlcx.floralskin.core.widget.DayNightTextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="我的奖励"
+                    android:textSize="13sp"
+                    app:dayResource="@{R.color.text_color_day}"
+                    app:nightResource="@{R.color.text_color_night}" />
+
+            </com.xlcx.floralskin.core.widget.DayNightLinearLayout>
+
+        </com.xlcx.floralskin.core.widget.DayNightRelativeLayout>
+
+    </com.xlcx.floralskin.core.widget.DayNightBgConstraintLayout>
+</layout>

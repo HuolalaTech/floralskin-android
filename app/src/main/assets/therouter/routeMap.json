@@ -1,0 +1,9 @@
+[
+  {
+    "path": "xiaola://scankit/scanqrcode",
+    "className": "com.xiaolachuxing.scankit.ScanQrCodeActivity",
+    "action": "",
+    "description": "",
+    "params": {}
+  }
+]

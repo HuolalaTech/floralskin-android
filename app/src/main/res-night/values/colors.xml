@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="minfrag_bg_night">#1E2024</color>
+    <color name="minfrag_menu_night">#2B2D33</color>
+    <color name="text_color_night">#FFFFFF</color>
+    <color name="top_head_bg_night">#1E2024</color>
+</resources>

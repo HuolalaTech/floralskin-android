@@ -1,0 +1,5 @@
+rootProject.name = "FloraSkin"
+include ':app'
+
+include ':lib-skin'
+include ':skinred'
