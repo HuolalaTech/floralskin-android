@@ -1,8 +1,12 @@
 # 一、项目介绍
 本项目是一个换肤的开源项目、基于该项目提供的基础能力.可动态加载皮肤包实现App换肤、并且支持日夜间模式。以上换肤能力、日夜间模式切换无需app重启
 
+## 详细介绍
+https://juejin.cn/post/7314587257956417586
+
 ## 换肤效果
-[image](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/81950d9c0dc74b948809541edee81609~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgZmlyc3RibG9vZA==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTY2MjExNzMxMzc4OTU0NCJ9&rk3s=e9ecf3d6&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1727342591&x-orig-sign=a2cFVPdo3GGEIZIA2zwVgXk2bD0%3D)
+效果图
+![image](https://github.com/HuolalaTech/floralskin-android/blob/main/skin-demo.gif)
 
 # 二、工程结构
 - app :换肤demo工程
